@@ -20,6 +20,10 @@ public class TransactionQRs implements Serializable {
         return code;
     }
 
+    public ArrayList< TransactionQRItem > getItems() {
+        return items;
+    }
+
     public Meta getMeta() {
         return MetaObject;
     }
@@ -32,6 +36,10 @@ public class TransactionQRs implements Serializable {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public void setItems(ArrayList<TransactionQRItem> items) {
+        this.items = items;
     }
 
     public void setMeta(Meta metaObject) {

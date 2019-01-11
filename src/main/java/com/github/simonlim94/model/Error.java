@@ -37,6 +37,7 @@ public class Error {
 
 class Description {
     Refund RefundObject;
+    private String type;
 
 
     // Getter Methods
@@ -44,11 +45,17 @@ class Description {
     public Refund getRefund() {
         return RefundObject;
     }
+    public String getType() {
+        return type;
+    }
 
     // Setter Methods
 
     public void setRefund(Refund refundObject) {
         this.RefundObject = refundObject;
+    }
+    public void setType(String type) {
+        this.type = type;
     }
 }
 
