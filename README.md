@@ -71,6 +71,25 @@ Environment environment = new Environment();
 environment.setEnvironment(clientId, clientSecret, "sandbox");
 ```
 
+* Sample to read private key file
+```
+String currentPath = System.getProperty("user.dir") + "/src/privateKey.pem";
+String privateKey = getKey(currentPath);
+environment.setPrivateKey(privateKey);
+
+private static String getKey(String filename) throws IOException {
+        //Read key from file
+        String strKeyPEM = "";
+        BufferedReader br = new BufferedReader(new FileReader(filename));
+        String line;
+        while((line = br.readLine()) != null){
+            strKeyPEM += line + "\n";
+        }
+        br.close();
+        return strKeyPEM;
+}
+```
+
 * Client Credentials (Authentication)
     * To get refresh token and access token(expired after 2 hours) with using provided clientId and clientSecret
 ```
@@ -109,21 +128,21 @@ data.put("type","DYNAMIC");
 data.put("storeId","123412341234");
 data.put("isPreFillAmount",true);
 Payment payment = new Payment();
-TransactionQR result = payment.CreateTransactionQRCodeURL(data,privateKey);
+TransactionQR result = payment.CreateTransactionQRCodeURL(data);
 ```
 
 * Get Transaction QRCode/URL (TransactionQR)
     * To get all QR Code(s) generated previously in the system
 ```
 Payment payment = new Payment();
-TransactionQRs result = payment.GetPaymentTransactionQRCodeURL("10","PERMANENT","PERMANENT",privateKey);
+TransactionQRs result = payment.GetPaymentTransactionQRCodeURL("10","PERMANENT","PERMANENT");
 ```
 
 * Get Transaction QRCode/URL By Code (TransactionQR)
     * To get specific QR Code generated previously in the system, by passing in code in query parameter (/qrcode/...)
 ```
 Payment payment = new Payment();
-TransactionQR result = payment.GetPaymentTransactionQRCodeURLByCode(code,privateKey);
+TransactionQR result = payment.GetPaymentTransactionQRCodeURLByCode(code);
             
 ```
 
@@ -131,7 +150,7 @@ TransactionQR result = payment.GetPaymentTransactionQRCodeURLByCode(code,private
     * To get all transactions under existing QR code, by passing in code in query parameter (/qrcode/.../transactions)
 ```
  Payment payment = new Payment();
-Transactions result = payment.GetTransactionsByCode(code,privateKey);            
+Transactions result = payment.GetTransactionsByCode(code);            
 ```
 
 * Payment (Quick Pay) - Payment
@@ -150,7 +169,7 @@ order.put("description","desc");
 order.put("additionalData","API Test");
 data.put("order",order);
 Payment payment = new Payment();
-TransactionQuickPay result = payment.QuickPay(data,privateKey);
+TransactionQuickPay result = payment.QuickPay(data);
 ```
 
 * Payment (Quick Pay) - Refund
@@ -165,7 +184,7 @@ refund.put("currencyType","MYR");
 refund.put("amount",100);
 data.put("refund",refund);
 Payment payment = new Payment();
-TransactionQuickPay result = payment.Refund(data,privateKey);
+TransactionQuickPay result = payment.Refund(data);
 ```
 
 * Payment (Quick Pay) - Reverse
@@ -174,21 +193,21 @@ TransactionQuickPay result = payment.Refund(data,privateKey);
 TreeMap<String,Object> data = new TreeMap<String,Object>();
 data.put("orderId","12345678131");
 Payment payment = new Payment();
-TransactionQuickPay result = payment.Reverse(data,privateKey);
+TransactionQuickPay result = payment.Reverse(data);
 ```
 
 * Payment (Quick Pay) - Get Payment Transaction By ID
     * To get details of a transaction by using transactionId
 ```
 Payment payment = new Payment();
-TransactionQuickPay result = payment.GetPaymentTransactionByID(transactionId,privateKey);
+TransactionQuickPay result = payment.GetPaymentTransactionByID(transactionId);
 ```
 
 * Payment (Quick Pay) - Get Payment Transaction By Order ID
     * To get details of a transaction by using orderId
 ```
 Payment payment = new Payment();
-TransactionQuickPay result = payment.GetPaymentTransactionByOrderID(orderId,privateKey);
+TransactionQuickPay result = payment.GetPaymentTransactionByOrderID(orderId);
 ```
 
 
