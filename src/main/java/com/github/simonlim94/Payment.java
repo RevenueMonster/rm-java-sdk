@@ -21,7 +21,7 @@ import java.time.Instant;
 import java.util.TreeMap;
 
 public class Payment {
-    public TransactionQuickPay QuickPay(TreeMap<String,Object> data, String privateKey){
+    public TransactionQuickPay QuickPay(TreeMap<String,Object> data){
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
@@ -42,7 +42,7 @@ public class Payment {
             String json = ow.writeValueAsString(data);
 
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature(json,privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
+            String signature = sign.GenerateSignature(json,env.privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
             signature = "sha256 "+signature;
 
             URL url = new URL(targetUrl);
@@ -81,7 +81,7 @@ public class Payment {
         return result;
     }
 
-    public TransactionQuickPay Refund(TreeMap<String,Object> data, String privateKey){
+    public TransactionQuickPay Refund(TreeMap<String,Object> data){
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
@@ -102,7 +102,7 @@ public class Payment {
             String json = ow.writeValueAsString(data);
 
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature(json,privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
+            String signature = sign.GenerateSignature(json,env.privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
             signature = "sha256 "+signature;
 
             URL url = new URL(targetUrl);
@@ -201,7 +201,7 @@ public class Payment {
         return result;
     }
 
-    public TransactionQuickPay GetPaymentTransactionByID(String transactionId, String privateKey){
+    public TransactionQuickPay GetPaymentTransactionByID(String transactionId){
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
@@ -220,7 +220,7 @@ public class Payment {
             myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
+            String signature = sign.GenerateSignature("",env.privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
             signature = "sha256 "+signature;
 
             URL url = new URL(targetUrl);
@@ -251,7 +251,7 @@ public class Payment {
         return result;
     }
 
-    public TransactionQuickPay GetPaymentTransactionByOrderID(String orderId, String privateKey){
+    public TransactionQuickPay GetPaymentTransactionByOrderID(String orderId){
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
@@ -270,7 +270,7 @@ public class Payment {
             myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
+            String signature = sign.GenerateSignature("",env.privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
             signature = "sha256 "+signature;
 
             URL url = new URL(targetUrl);
@@ -301,7 +301,7 @@ public class Payment {
         return result;
     }
 
-    public TransactionQR CreateTransactionQRCodeURL(TreeMap<String,Object> data, String privateKey){
+    public TransactionQR CreateTransactionQRCodeURL(TreeMap<String,Object> data){
         TransactionQR result = new TransactionQR();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
@@ -322,7 +322,7 @@ public class Payment {
             String json = ow.writeValueAsString(data);
 
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature(json,privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
+            String signature = sign.GenerateSignature(json,env.privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
             signature = "sha256 "+signature;
 
             URL url = new URL(targetUrl);
@@ -361,7 +361,7 @@ public class Payment {
         return result;
     }
 
-    public TransactionQRs GetPaymentTransactionQRCodeURL(String limit, String type, String expiryType, String privateKey){
+    public TransactionQRs GetPaymentTransactionQRCodeURL(String limit, String type, String expiryType){
         TransactionQRs result = new TransactionQRs();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
@@ -379,7 +379,7 @@ public class Payment {
             myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
+            String signature = sign.GenerateSignature("",env.privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
             signature = "sha256 "+signature;
 
             URL url = new URL(targetUrl);
@@ -410,7 +410,7 @@ public class Payment {
         return result;
     }
 
-    public TransactionQR GetPaymentTransactionQRCodeURLByCode(String qrcode, String privateKey){
+    public TransactionQR GetPaymentTransactionQRCodeURLByCode(String qrcode){
         TransactionQR result = new TransactionQR();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
@@ -428,7 +428,7 @@ public class Payment {
             myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
+            String signature = sign.GenerateSignature("",env.privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
             signature = "sha256 "+signature;
 
             URL url = new URL(targetUrl);
@@ -459,7 +459,7 @@ public class Payment {
         return result;
     }
 
-    public Transactions GetTransactionsByCode(String qrcode, String privateKey){
+    public Transactions GetTransactionsByCode(String qrcode){
         Transactions result = new Transactions();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
@@ -477,7 +477,7 @@ public class Payment {
             myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
+            String signature = sign.GenerateSignature("",env.privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
             signature = "sha256 "+signature;
 
             URL url = new URL(targetUrl);

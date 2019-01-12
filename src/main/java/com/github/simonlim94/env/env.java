@@ -6,4 +6,5 @@ public class env {
     public static String environment;
     public static String accessToken;
     public static String refreshToken;
+    public static String privateKey;
 }

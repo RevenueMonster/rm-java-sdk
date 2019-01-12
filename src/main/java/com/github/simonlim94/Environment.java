@@ -16,4 +16,8 @@ public class Environment {
     public void setRefreshToken(String refreshToken){
         env.refreshToken = refreshToken;
     }
+
+    public void setPrivateKey(String privateKey){
+        env.privateKey = privateKey;
+    }
 }

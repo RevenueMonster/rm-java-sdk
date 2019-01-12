@@ -8,6 +8,10 @@
     <artifactId>RevenueMonsterOpenAPI</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <name>Revenue Monster Open API</name>
+    <description>This is an Java SDK that maps some of the RESTful methods of Open API that are documented at doc.revenuemonster.my</description>
+    <url>https://doc.revenuemonster.my</url>
+
     <dependencies>
         <dependency>
             <groupId>commons-codec</groupId>
