@@ -18,7 +18,7 @@ The external library u need to install in order to build this library (Maven):
 The Java framework you would need for this project is Java 8 or above
 
 ### Or simply download the jar file here and start using at your project
-[Google Drive](https://drive.google.com/open?id=1SCuAHG_wABslfGy2HnzYcNgTL2vcQz75)
+[Google Drive](https://drive.google.com/file/d/1SCuAHG_wABslfGy2HnzYcNgTL2vcQz75/view?usp=sharing)
 
 ### Covered Functions
 - [x] Signature Algorithm
