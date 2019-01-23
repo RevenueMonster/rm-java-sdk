@@ -99,6 +99,15 @@ environment.setRefreshToken(clientCredentials.refreshToken);
 environment.setAccessToken(clientCredentials.accessToken);
 ```
 
+* Authorization Code (Authentication)
+    * To get authorization code which a partner wants to request permission to develop an application of a merchant and exchange authorization code into access token and refresh token
+```
+Authentication authentication = new Authentication();
+ClientCredentials clientCredentials = authentication.GetAuthorizationCode(authorizationCode,redirectUrl);
+environment.setRefreshToken(clientCredentials.refreshToken);
+environment.setAccessToken(clientCredentials.accessToken);
+```
+
 * Refresh Token (Authentication)
     * To get new access token(expired after 2 hours) with using provided clientId and clientSecret (recommended to schedule to run this fucntion on every less than 2 hours) in order to avoid expired access token error
 ```
