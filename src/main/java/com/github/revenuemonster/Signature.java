@@ -2,15 +2,12 @@ package com.github.revenuemonster;
 
 import com.github.revenuemonster.util.Encode;
 import org.apache.commons.codec.binary.Base64;
+import java.nio.ByteBuffer;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerValue;
-import java.security.GeneralSecurityException;
 import java.math.BigInteger;
 import java.security.spec.RSAPrivateCrtKeySpec;
-
 
 public class Signature {
     public String GenerateSignature(String compactData,String privateKey, String requestUrl, String nonceStr, String signType, String method, String timestamp){
@@ -61,33 +58,48 @@ public class Signature {
             privateKeyPem = privateKeyPem.replace("-----BEGIN RSA PRIVATE KEY-----", "").replace("-----END RSA PRIVATE KEY-----", "");
             privateKeyPem = privateKeyPem.replaceAll("\\s", "");
 
-            DerInputStream derReader = new DerInputStream(Base64.decodeBase64(privateKeyPem));
+            byte[] encodedPrivateKey = Base64.decodeBase64(privateKeyPem);
+            ByteBuffer input = ByteBuffer.wrap(encodedPrivateKey);
+            if (der(input, 0x30) != input.remaining()) throw new IllegalArgumentException("Excess data");
+            if (!BigInteger.ZERO.equals(derint(input))) throw new IllegalArgumentException("Unsupported version");
+            BigInteger modulus = derint(input);
+            BigInteger publicExponent = derint(input);
+            BigInteger privateExponent = derint(input);
+            BigInteger prime1 = derint(input);
+            BigInteger prime2 = derint(input);
+            BigInteger exponent1 = derint(input);
+            BigInteger exponent2 = derint(input);
+            BigInteger coefficient = derint(input);
 
-            DerValue[] seq = derReader.getSequence(0);
-
-            if (seq.length < 9) {
-                throw new GeneralSecurityException("Could not parse a PKCS1 private key.");
-            }
-
-            // skip version seq[0];
-            BigInteger modulus = seq[1].getBigInteger();
-            BigInteger publicExp = seq[2].getBigInteger();
-            BigInteger privateExp = seq[3].getBigInteger();
-            BigInteger prime1 = seq[4].getBigInteger();
-            BigInteger prime2 = seq[5].getBigInteger();
-            BigInteger exp1 = seq[6].getBigInteger();
-            BigInteger exp2 = seq[7].getBigInteger();
-            BigInteger crtCoef = seq[8].getBigInteger();
-
-            RSAPrivateCrtKeySpec keySpec = new RSAPrivateCrtKeySpec(modulus, publicExp, privateExp, prime1, prime2, exp1, exp2, crtCoef);
-
+            RSAPrivateCrtKeySpec keySpec = new RSAPrivateCrtKeySpec(modulus, publicExponent, privateExponent, prime1, prime2, exponent1, exponent2, coefficient);
             KeyFactory factory = KeyFactory.getInstance("RSA");
-
             result = factory.generatePrivate(keySpec);
         }catch(Exception ex){
             ex.printStackTrace();
         }
         return result;
+    }
+
+    private static BigInteger derint(ByteBuffer input) {
+        int len = der(input, 0x02);
+        byte[] value = new byte[len];
+        input.get(value);
+        return new BigInteger(+1, value);
+    }
+
+    private static int der(ByteBuffer input, int exp) {
+        int tag = input.get() & 0xFF;
+        if (tag != exp) throw new IllegalArgumentException("Unexpected tag");
+        int n = input.get() & 0xFF;
+        if (n < 128) return n;
+        n &= 0x7F;
+        if ((n < 1) || (n > 2)) throw new IllegalArgumentException("Invalid length");
+        int len = 0;
+        while (n-- > 0) {
+            len <<= 8;
+            len |= input.get() & 0xFF;
+        }
+        return len;
     }
 
     private static PrivateKey readPKCS8Key(String privateKeyPem){
