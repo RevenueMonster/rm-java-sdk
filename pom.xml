@@ -4,13 +4,36 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.simonlim94</groupId>
+    <groupId>com.github.revenuemonster</groupId>
     <artifactId>RevenueMonsterOpenAPI</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <name>Revenue Monster Open API</name>
     <description>This is an Java SDK that maps some of the RESTful methods of Open API that are documented at doc.revenuemonster.my</description>
-    <url>https://doc.revenuemonster.my</url>
+    <url>https://github.com/RevenueMonster/RM-API-SDK-JAVA</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Simon Lim Xin Jong</name>
+            <email>xin.jong@hotmail.com</email>
+            <organization>Revenue Monster</organization>
+            <organizationUrl>https://revenuemonster.my/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/RevenueMonster/RM-API-SDK-JAVA.git</connection>
+        <developerConnection>scm:git:ssh://github.com:RevenueMonster/RM-API-SDK-JAVA.git</developerConnection>
+        <url>https://github.com/RevenueMonster/RM-API-SDK-JAVA</url>
+    </scm>
 
     <dependencies>
         <dependency>
