@@ -29,7 +29,7 @@ The Java framework you would need for this project is Java 8 or above
 <dependency>
   <groupId>com.github.revenuemonster</groupId>
   <artifactId>RevenueMonsterOpenAPI</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 </dependency>
 ```
 
