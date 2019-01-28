@@ -64,6 +64,54 @@ public class Authentication {
         return result;
     }
 
+    public ClientCredentials GetClientCredentials(String clientId,String clientSecret,String environment){
+        ClientCredentials result = new ClientCredentials();
+        String parameter = clientId+":"+clientSecret;
+        String encodeParameter = Encode.Base64Encode(parameter);
+        String targetUrl = "";
+
+        if(environment == "sandbox"){
+            targetUrl = Url.SandBoxOAuth + "/v1/token";
+        }else if(environment == "production"){
+            targetUrl = Url.ProductionOAuth + "/v1/token";
+        }
+
+        String basicAuth  ="Basic "+encodeParameter;
+        try {
+            Object values = new Object() {
+                String grantType = "client_credentials";
+            };
+            ObjectMapper myObjectMapper = new ObjectMapper();
+            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            ObjectWriter ow = myObjectMapper.writer().withDefaultPrettyPrinter();
+            String json = ow.writeValueAsString(values);
+
+            URL url = new URL(targetUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Authorization", basicAuth);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json;");
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+
+            // write json into body
+            OutputStream os = connection.getOutputStream();
+            os.write(json.getBytes("UTF-8"));
+            os.close();
+
+            // read the response
+            InputStream in = new BufferedInputStream(connection.getInputStream());
+            String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
+            result = myObjectMapper.readValue(response,ClientCredentials.class);
+
+            in.close();
+            connection.disconnect();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
     public ClientCredentials GetAuthorizationCode(final String Code, final String RedirectUri){
         ClientCredentials result = new ClientCredentials();
         String parameter = env.clientId+":"+env.clientSecret;
@@ -121,6 +169,62 @@ public class Authentication {
         return result;
     }
 
+    public ClientCredentials GetAuthorizationCode(final String Code, final String RedirectUri, String clientId, String clientSecret, String environment){
+        ClientCredentials result = new ClientCredentials();
+        String parameter = clientId+":"+clientSecret;
+        String encodeParameter = Encode.Base64Encode(parameter);
+        String targetUrl = "";
+
+        if(environment == "sandbox"){
+            targetUrl = Url.SandBoxOAuth + "/v1/token";
+        }else if(environment == "production"){
+            targetUrl = Url.ProductionOAuth + "/v1/token";
+        }
+
+        String basicAuth  ="Basic "+encodeParameter;
+        try {
+            Object values = new Object() {
+                String grantType = "authorization_code";
+                String code = Code;
+                String redirectUri = RedirectUri;
+            };
+            ObjectMapper myObjectMapper = new ObjectMapper();
+            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            ObjectWriter ow = myObjectMapper.writer().withDefaultPrettyPrinter();
+            String json = ow.writeValueAsString(values);
+
+            URL url = new URL(targetUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Authorization", basicAuth);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json;");
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+
+            // write json into body
+            OutputStream os = connection.getOutputStream();
+            os.write(json.getBytes("UTF-8"));
+            os.close();
+
+            // read the response
+            int code = connection.getResponseCode();
+            InputStream in = null;
+            if(code > 200 ) {
+                in = connection.getErrorStream();
+            }else {
+                in = new BufferedInputStream(connection.getInputStream());
+            }
+            String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
+            System.out.println(response);
+            result = myObjectMapper.readValue(response,ClientCredentials.class);
+
+            in.close();
+            connection.disconnect();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return result;
+    }
 
     public ClientCredentials RefreshToken(){
         ClientCredentials result = new ClientCredentials();
@@ -132,6 +236,56 @@ public class Authentication {
         if(env.environment == "sandbox"){
             targetUrl = Url.SandBoxOAuth + "/v1/token";
         }else if(env.environment == "production"){
+            targetUrl = Url.ProductionOAuth + "/v1/token";
+        }
+
+        String basicAuth  ="Basic "+encodeParameter;
+        try {
+            Object values = new Object() {
+                String grantType = "refresh_token";
+                String refreshToken = refreshtoken;
+            };
+            ObjectMapper myObjectMapper = new ObjectMapper();
+            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            ObjectWriter ow = myObjectMapper.writer().withDefaultPrettyPrinter();
+            String json = ow.writeValueAsString(values);
+
+            URL url = new URL(targetUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Authorization", basicAuth);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+
+            // write json into body
+            OutputStream os = connection.getOutputStream();
+            os.write(json.getBytes("UTF-8"));
+            os.close();
+
+            // read the response
+            InputStream in = new BufferedInputStream(connection.getInputStream());
+            String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
+            result = myObjectMapper.readValue(response,ClientCredentials.class);
+
+            in.close();
+            connection.disconnect();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
+    public ClientCredentials RefreshToken(String clientId, String clientSecret, String environment){
+        ClientCredentials result = new ClientCredentials();
+        String parameter = clientId+":"+clientSecret;
+        String encodeParameter = Encode.Base64Encode(parameter);
+        final String refreshtoken = env.refreshToken;
+        String targetUrl = "";
+
+        if(environment == "sandbox"){
+            targetUrl = Url.SandBoxOAuth + "/v1/token";
+        }else if(environment == "production"){
             targetUrl = Url.ProductionOAuth + "/v1/token";
         }
 

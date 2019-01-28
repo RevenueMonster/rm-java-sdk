@@ -10,8 +10,5 @@
         <module name="RMOpenAPI" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="RMOpenAPI" target="8" />
-    </bytecodeTargetLevel>
   </component>
 </project>
