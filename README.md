@@ -36,7 +36,7 @@ The Java framework you would need for this project is Java 8 or above
 - Gradle
 
 ```
-implementation 'com.github.revenuemonster:RevenueMonsterOpenAPI:1.0.1'
+implementation 'com.github.revenuemonster:RevenueMonsterOpenAPI:1.0.2'
 ```
 
 ### Or simply download the jar file here and start using at your project
