@@ -7,6 +7,7 @@ public class ClientCredentials implements Serializable {
     public String tokenType;
     public Integer expiresIn;
     public String refreshToken;
+    public Integer refreshTokenExpiresIn;
     public Error error;
 
     // Getter Methods
