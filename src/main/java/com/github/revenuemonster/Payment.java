@@ -2,6 +2,7 @@ package com.github.revenuemonster;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.revenuemonster.constant.Url;
@@ -10,6 +11,7 @@ import com.github.revenuemonster.model.TransactionQR;
 import com.github.revenuemonster.model.TransactionQuickPay;
 import com.github.revenuemonster.model.TransactionQRs;
 import com.github.revenuemonster.model.Transactions;
+import com.github.revenuemonster.util.JSON;
 import com.github.revenuemonster.util.RandomString;
 
 import java.io.BufferedInputStream;
@@ -21,29 +23,25 @@ import java.time.Instant;
 import java.util.TreeMap;
 
 public class Payment {
-    public TransactionQuickPay QuickPay(TreeMap<String,Object> data){
+    public TransactionQuickPay QuickPay(TreeMap<String, Object> data) {
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+env.accessToken;
+        String authorization = "Bearer " + env.accessToken;
 
-        if(env.environment == "sandbox"){
+        if (env.environment == "sandbox") {
             targetUrl = Url.SandBoxOpen + "/v3/payment/quickpay";
-        }else if(env.environment == "production"){
+        } else if (env.environment == "production") {
             targetUrl = Url.ProductionOpen + "/v3/payment/quickpay";
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            ObjectWriter ow = myObjectMapper.writer();
-            String json = ow.writeValueAsString(data);
-
+            String json = JSON.stringify(data);
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature(json,env.privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature(json, env.privateKey, targetUrl, randomString, "sha256", "post",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -65,45 +63,41 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQuickPay.class);
-
+            result = JSON.parse(response, TransactionQuickPay.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQuickPay QuickPay(TreeMap<String,Object> data, String accessToken, String environment, String privateKey){
+    public TransactionQuickPay QuickPay(TreeMap<String, Object> data, String accessToken, String environment,
+            String privateKey) {
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+accessToken;
+        String authorization = "Bearer " + accessToken;
 
-        if(environment == "sandbox"){
+        if (environment == "sandbox") {
             targetUrl = Url.SandBoxOpen + "/v3/payment/quickpay";
-        }else if(environment == "production"){
+        } else if (environment == "production") {
             targetUrl = Url.ProductionOpen + "/v3/payment/quickpay";
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            ObjectWriter ow = myObjectMapper.writer();
-            String json = ow.writeValueAsString(data);
-
+            String json = JSON.stringify(data);
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature(json,privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature(json, privateKey, targetUrl, randomString, "sha256", "post",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -125,45 +119,41 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQuickPay.class);
+            result = JSON.parse(response, TransactionQuickPay.class);
 
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQuickPay Refund(TreeMap<String,Object> data){
+    public TransactionQuickPay Refund(TreeMap<String, Object> data) {
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+env.accessToken;
+        String authorization = "Bearer " + env.accessToken;
 
-        if(env.environment == "sandbox"){
+        if (env.environment == "sandbox") {
             targetUrl = Url.SandBoxOpen + "/v3/payment/refund";
-        }else if(env.environment == "production"){
+        } else if (env.environment == "production") {
             targetUrl = Url.ProductionOpen + "/v3/payment/refund";
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            ObjectWriter ow = myObjectMapper.writer();
-            String json = ow.writeValueAsString(data);
-
+            String json = JSON.stringify(data);
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature(json,env.privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature(json, env.privateKey, targetUrl, randomString, "sha256", "post",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -185,45 +175,41 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQuickPay.class);
-
+            result = JSON.parse(response, TransactionQuickPay.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQuickPay Refund(TreeMap<String,Object> data, String accessToken, String environment, String privateKey){
+    public TransactionQuickPay Refund(TreeMap<String, Object> data, String accessToken, String environment,
+            String privateKey) {
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+accessToken;
+        String authorization = "Bearer " + accessToken;
 
-        if(environment == "sandbox"){
+        if (environment == "sandbox") {
             targetUrl = Url.SandBoxOpen + "/v3/payment/refund";
-        }else if(environment == "production"){
+        } else if (environment == "production") {
             targetUrl = Url.ProductionOpen + "/v3/payment/refund";
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            ObjectWriter ow = myObjectMapper.writer();
-            String json = ow.writeValueAsString(data);
-
+            String json = JSON.stringify(data);
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature(json,privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature(json, privateKey, targetUrl, randomString, "sha256", "post",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -245,45 +231,41 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQuickPay.class);
+            result = JSON.parse(response, TransactionQuickPay.class);
 
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQuickPay Reverse(TreeMap<String,Object> data){
+    public TransactionQuickPay Reverse(TreeMap<String, Object> data) {
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+env.accessToken;
+        String authorization = "Bearer " + env.accessToken;
 
-        if(env.environment == "sandbox"){
+        if (env.environment == "sandbox") {
             targetUrl = Url.SandBoxOpen + "/v3/payment/reverse";
-        }else if(env.environment == "production"){
+        } else if (env.environment == "production") {
             targetUrl = Url.ProductionOpen + "/v3/payment/reverse";
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            ObjectWriter ow = myObjectMapper.writer();
-            String json = ow.writeValueAsString(data);
-
+            String json = JSON.stringify(data);
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature(json,env.privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature(json, env.privateKey, targetUrl, randomString, "sha256", "post",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -305,45 +287,42 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQuickPay.class);
+            result = JSON.parse(response, TransactionQuickPay.class);
 
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQuickPay Reverse(TreeMap<String,Object> data, String accessToken, String environment, String privateKey){
+    public TransactionQuickPay Reverse(TreeMap<String, Object> data, String accessToken, String environment,
+            String privateKey) {
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+accessToken;
+        String authorization = "Bearer " + accessToken;
 
-        if(environment == "sandbox"){
+        if (environment == "sandbox") {
             targetUrl = Url.SandBoxOpen + "/v3/payment/reverse";
-        }else if(environment == "production"){
+        } else if (environment == "production") {
             targetUrl = Url.ProductionOpen + "/v3/payment/reverse";
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            ObjectWriter ow = myObjectMapper.writer();
-            String json = ow.writeValueAsString(data);
-
+            String json = JSON.stringify(data);
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature(json,privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature(json, privateKey, targetUrl, randomString, "sha256", "post",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -365,43 +344,40 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQuickPay.class);
+            result = JSON.parse(response, TransactionQuickPay.class);
 
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQuickPay GetPaymentTransactionByID(String transactionId){
+    public TransactionQuickPay GetPaymentTransactionByID(String transactionId) {
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+env.accessToken;
+        String authorization = "Bearer " + env.accessToken;
 
-        if(env.environment == "sandbox"){
-            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/"+transactionId;
-        }else if(env.environment == "production"){
-            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/"+transactionId;
+        if (env.environment == "sandbox") {
+            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/" + transactionId;
+        } else if (env.environment == "production") {
+            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/" + transactionId;
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",env.privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature("", env.privateKey, targetUrl, randomString, "sha256", "get",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -416,42 +392,40 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQuickPay.class);
+            result = JSON.parse(response, TransactionQuickPay.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQuickPay GetPaymentTransactionByID(String transactionId, String accessToken, String environment, String privateKey){
+    public TransactionQuickPay GetPaymentTransactionByID(String transactionId, String accessToken, String environment,
+            String privateKey) {
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+accessToken;
+        String authorization = "Bearer " + accessToken;
 
-        if(environment == "sandbox"){
-            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/"+transactionId;
-        }else if(environment == "production"){
-            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/"+transactionId;
+        if (environment == "sandbox") {
+            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/" + transactionId;
+        } else if (environment == "production") {
+            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/" + transactionId;
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature("", privateKey, targetUrl, randomString, "sha256", "get",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -466,42 +440,39 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQuickPay.class);
+            result = JSON.parse(response, TransactionQuickPay.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQuickPay GetPaymentTransactionByOrderID(String orderId){
+    public TransactionQuickPay GetPaymentTransactionByOrderID(String orderId) {
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+env.accessToken;
+        String authorization = "Bearer " + env.accessToken;
 
-        if(env.environment == "sandbox"){
-            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/order/"+orderId;
-        }else if(env.environment == "production"){
-            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/order/"+orderId;
+        if (env.environment == "sandbox") {
+            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/order/" + orderId;
+        } else if (env.environment == "production") {
+            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/order/" + orderId;
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",env.privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature("", env.privateKey, targetUrl, randomString, "sha256", "get",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -516,42 +487,40 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQuickPay.class);
+            result = JSON.parse(response, TransactionQuickPay.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQuickPay GetPaymentTransactionByOrderID(String orderId,String accessToken,String environment, String privateKey){
+    public TransactionQuickPay GetPaymentTransactionByOrderID(String orderId, String accessToken, String environment,
+            String privateKey) {
         TransactionQuickPay result = new TransactionQuickPay();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+accessToken;
+        String authorization = "Bearer " + accessToken;
 
-        if(environment == "sandbox"){
-            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/order/"+orderId;
-        }else if(environment == "production"){
-            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/order/"+orderId;
+        if (environment == "sandbox") {
+            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/order/" + orderId;
+        } else if (environment == "production") {
+            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/order/" + orderId;
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature("", privateKey, targetUrl, randomString, "sha256", "get",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -566,44 +535,40 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQuickPay.class);
+            result = JSON.parse(response, TransactionQuickPay.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQR CreateTransactionQRCodeURL(TreeMap<String,Object> data){
+    public TransactionQR CreateTransactionQRCodeURL(TreeMap<String, Object> data) {
         TransactionQR result = new TransactionQR();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+env.accessToken;
+        String authorization = "Bearer " + env.accessToken;
 
-        if(env.environment == "sandbox"){
+        if (env.environment == "sandbox") {
             targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcode";
-        }else if(env.environment == "production"){
+        } else if (env.environment == "production") {
             targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcode";
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            ObjectWriter ow = myObjectMapper.writer();
-            String json = ow.writeValueAsString(data);
-
+            String json = JSON.stringify(data);
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature(json,env.privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature(json, env.privateKey, targetUrl, randomString, "sha256", "post",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -625,45 +590,42 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQR.class);
+            result = JSON.parse(response, TransactionQR.class);
 
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQR CreateTransactionQRCodeURL(TreeMap<String,Object> data,String accessToken,String environment,String privateKey){
+    public TransactionQR CreateTransactionQRCodeURL(TreeMap<String, Object> data, String accessToken,
+            String environment, String privateKey) {
         TransactionQR result = new TransactionQR();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+accessToken;
+        String authorization = "Bearer " + accessToken;
 
-        if(environment == "sandbox"){
+        if (environment == "sandbox") {
             targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcode";
-        }else if(environment == "production"){
+        } else if (environment == "production") {
             targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcode";
         }
 
-
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            ObjectWriter ow = myObjectMapper.writer();
-            String json = ow.writeValueAsString(data);
-
+            String json = JSON.stringify(data);
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature(json,privateKey,targetUrl,randomString,"sha256","post",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature(json, privateKey, targetUrl, randomString, "sha256", "post",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -685,42 +647,42 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQR.class);
+            result = JSON.parse(response, TransactionQR.class);
 
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQRs GetPaymentTransactionQRCodeURL(String limit, String type, String expiryType){
+    public TransactionQRs GetPaymentTransactionQRCodeURL(String limit, String type, String expiryType) {
         TransactionQRs result = new TransactionQRs();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+env.accessToken;
+        String authorization = "Bearer " + env.accessToken;
 
-        if(env.environment == "sandbox"){
-            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcodes?order[]=-createdAt&limit="+limit+"&filter={%22type%22:%"+type+"%22,%20%22expiry.type%22:%20%22"+expiryType+"%22}";
-        }else if(env.environment == "production"){
-            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcodes?order[]=-createdAt&limit="+limit+"&filter={%22type%22:%"+type+"%22,%20%22expiry.type%22:%20%22"+expiryType+"%22}";
+        if (env.environment == "sandbox") {
+            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcodes?order[]=-createdAt&limit=" + limit
+                    + "&filter={%22type%22:%" + type + "%22,%20%22expiry.type%22:%20%22" + expiryType + "%22}";
+        } else if (env.environment == "production") {
+            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcodes?order[]=-createdAt&limit=" + limit
+                    + "&filter={%22type%22:%" + type + "%22,%20%22expiry.type%22:%20%22" + expiryType + "%22}";
         }
 
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",env.privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature("", env.privateKey, targetUrl, randomString, "sha256", "get",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -735,41 +697,42 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQRs.class);
+            result = JSON.parse(response, TransactionQRs.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQRs GetPaymentTransactionQRCodeURL(String limit, String type, String expiryType,String accessToken,String environment,String privateKey){
+    public TransactionQRs GetPaymentTransactionQRCodeURL(String limit, String type, String expiryType,
+            String accessToken, String environment, String privateKey) {
         TransactionQRs result = new TransactionQRs();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+accessToken;
+        String authorization = "Bearer " + accessToken;
 
-        if(environment == "sandbox"){
-            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcodes?order[]=-createdAt&limit="+limit+"&filter={%22type%22:%"+type+"%22,%20%22expiry.type%22:%20%22"+expiryType+"%22}";
-        }else if(environment == "production"){
-            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcodes?order[]=-createdAt&limit="+limit+"&filter={%22type%22:%"+type+"%22,%20%22expiry.type%22:%20%22"+expiryType+"%22}";
+        if (environment == "sandbox") {
+            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcodes?order[]=-createdAt&limit=" + limit
+                    + "&filter={%22type%22:%" + type + "%22,%20%22expiry.type%22:%20%22" + expiryType + "%22}";
+        } else if (environment == "production") {
+            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcodes?order[]=-createdAt&limit=" + limit
+                    + "&filter={%22type%22:%" + type + "%22,%20%22expiry.type%22:%20%22" + expiryType + "%22}";
         }
 
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature("", privateKey, targetUrl, randomString, "sha256", "get",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -784,41 +747,39 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQRs.class);
+            result = JSON.parse(response, TransactionQRs.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQR GetPaymentTransactionQRCodeURLByCode(String qrcode){
+    public TransactionQR GetPaymentTransactionQRCodeURLByCode(String qrcode) {
         TransactionQR result = new TransactionQR();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+env.accessToken;
+        String authorization = "Bearer " + env.accessToken;
 
-        if(env.environment == "sandbox"){
-            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcode/"+qrcode;
-        }else if(env.environment == "production"){
-            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcode/"+qrcode;
+        if (env.environment == "sandbox") {
+            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcode/" + qrcode;
+        } else if (env.environment == "production") {
+            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcode/" + qrcode;
         }
 
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",env.privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature("", env.privateKey, targetUrl, randomString, "sha256", "get",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -833,41 +794,40 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQR.class);
+            result = JSON.parse(response, TransactionQR.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public TransactionQR GetPaymentTransactionQRCodeURLByCode(String qrcode, String accessToken, String environment,String privateKey){
+    public TransactionQR GetPaymentTransactionQRCodeURLByCode(String qrcode, String accessToken, String environment,
+            String privateKey) {
         TransactionQR result = new TransactionQR();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+accessToken;
+        String authorization = "Bearer " + accessToken;
 
-        if(environment == "sandbox"){
-            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcode/"+qrcode;
-        }else if(environment == "production"){
-            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcode/"+qrcode;
+        if (environment == "sandbox") {
+            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcode/" + qrcode;
+        } else if (environment == "production") {
+            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcode/" + qrcode;
         }
 
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature("", privateKey, targetUrl, randomString, "sha256", "get",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -882,41 +842,39 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, TransactionQR.class);
+            result = JSON.parse(response, TransactionQR.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public Transactions GetTransactionsByCode(String qrcode){
+    public Transactions GetTransactionsByCode(String qrcode) {
         Transactions result = new Transactions();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+env.accessToken;
+        String authorization = "Bearer " + env.accessToken;
 
-        if(env.environment == "sandbox"){
-            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcode/"+qrcode+"/transactions";
-        }else if(env.environment == "production"){
-            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcode/"+qrcode+"/transactions";
+        if (env.environment == "sandbox") {
+            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcode/" + qrcode + "/transactions";
+        } else if (env.environment == "production") {
+            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcode/" + qrcode + "/transactions";
         }
 
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",env.privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature("", env.privateKey, targetUrl, randomString, "sha256", "get",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -931,41 +889,40 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, Transactions.class);
+            result = JSON.parse(response, Transactions.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
     }
 
-    public Transactions GetTransactionsByCode(String qrcode,String accessToken,String environment,String privateKey){
+    public Transactions GetTransactionsByCode(String qrcode, String accessToken, String environment,
+            String privateKey) {
         Transactions result = new Transactions();
         String targetUrl = "";
         final String randomString = RandomString.GenerateRandomString(32);
         long unixTimestamp = Instant.now().getEpochSecond();
-        String authorization = "Bearer "+accessToken;
+        String authorization = "Bearer " + accessToken;
 
-        if(environment == "sandbox"){
-            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcode/"+qrcode+"/transactions";
-        }else if(environment == "production"){
-            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcode/"+qrcode+"/transactions";
+        if (environment == "sandbox") {
+            targetUrl = Url.SandBoxOpen + "/v3/payment/transaction/qrcode/" + qrcode + "/transactions";
+        } else if (environment == "production") {
+            targetUrl = Url.ProductionOpen + "/v3/payment/transaction/qrcode/" + qrcode + "/transactions";
         }
 
         try {
-            ObjectMapper myObjectMapper = new ObjectMapper();
-            myObjectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
             Signature sign = new Signature();
-            String signature = sign.GenerateSignature("",privateKey,targetUrl,randomString,"sha256","get",String.valueOf(unixTimestamp));
-            signature = "sha256 "+signature;
+            String signature = sign.GenerateSignature("", privateKey, targetUrl, randomString, "sha256", "get",
+                    String.valueOf(unixTimestamp));
+            signature = "sha256 " + signature;
 
             URL url = new URL(targetUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -980,16 +937,16 @@ public class Payment {
             // read the response
             int code = connection.getResponseCode();
             InputStream in = null;
-            if(code > 200 ) {
+            if (code > 200) {
                 in = connection.getErrorStream();
-            }else {
+            } else {
                 in = new BufferedInputStream(connection.getInputStream());
             }
             String response = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            result = myObjectMapper.readValue(response, Transactions.class);
+            result = JSON.parse(response, Transactions.class);
             in.close();
             connection.disconnect();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return result;
